@@ -1,2 +1,2 @@
-# diva-load-tests
+# cora-load-tests
 
