@@ -1,0 +1,1587 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="PROTOCOL" elementType="Argument">
+            <stringProp name="Argument.name">PROTOCOL</stringProp>
+            <stringProp name="Argument.value">http</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="HOST" elementType="Argument">
+            <stringProp name="Argument.name">HOST</stringProp>
+            <stringProp name="Argument.value">192.168.49.2</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">30982</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ADMIN_USER" elementType="Argument">
+            <stringProp name="Argument.name">ADMIN_USER</stringProp>
+            <stringProp name="Argument.value">divaAdmin@cora.epc.ub.uu.se</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ADMIN_APPTOKEN" elementType="Argument">
+            <stringProp name="Argument.name">ADMIN_APPTOKEN</stringProp>
+            <stringProp name="Argument.value">changeme</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+        <stringProp name="TestPlan.comments">These can be passed into jmeter as arguments when running from commandline</stringProp>
+      </Arguments>
+      <hashTree/>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Common fragments" enabled="false"/>
+      <hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="AUTH - Apptoken Login">
+          <stringProp name="TestPlan.comments">Used to login to the system using apptoken, extract and assign the returned authtoken as a variable ${authtoken}</stringProp>
+        </GenericController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/login/rest/apptoken</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">${__P(ADMIN_USER,${ADMIN_USER})}${__char(10)}${__P(ADMIN_APPTOKEN,${ADMIN_APPTOKEN})}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.authentication+json</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.login</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract authtoken" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">authtoken</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.authentication.data.children[?(@.name==&apos;token&apos;)].value</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            </JSONPostProcessor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert authtoken set" enabled="true">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">def token = vars.get(&quot;authtoken&quot;)
+
+if (token == null || token.trim().isEmpty()) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Failed to extract authtoken, cannot proceed with tests&quot;)
+}</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="ADMIN - Output Test Fragment - Common calls to use as modules for test" enabled="false"/>
+      <hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Create paper (diva-output)" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Create paper (diva-output)" enabled="true">
+            <stringProp name="TestPlan.comments">Create an output with minimal data,</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-output</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;name&quot;: &quot;output&quot;,&#xd;
+    &quot;children&quot;: [&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;recordInfo&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;validationType&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;validationType&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;conference_paper&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;dataDivider&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;system&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;divaData&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;permissionUnit&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;permissionUnit&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;nationalmuseum&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;visibility&quot;,&#xd;
+                    &quot;value&quot;: &quot;published&quot;&#xd;
+                }&#xd;
+            ]&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;dataQuality&quot;,&#xd;
+            &quot;value&quot;: &quot;2026&quot;&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;genre&quot;,&#xd;
+            &quot;value&quot;: &quot;conference_paper&quot;,&#xd;
+            &quot;attributes&quot;: {&#xd;
+                &quot;type&quot;: &quot;outputType&quot;&#xd;
+            }&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;language&quot;,&#xd;
+            &quot;repeatId&quot;: &quot;0&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;languageTerm&quot;,&#xd;
+                    &quot;value&quot;: &quot;swe&quot;,&#xd;
+                    &quot;attributes&quot;: {&#xd;
+                        &quot;type&quot;: &quot;code&quot;,&#xd;
+                        &quot;authority&quot;: &quot;iso639-2b&quot;&#xd;
+                    }&#xd;
+                }&#xd;
+            ]&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;genre&quot;,&#xd;
+            &quot;value&quot;: &quot;ref&quot;,&#xd;
+            &quot;attributes&quot;: {&#xd;
+                &quot;type&quot;: &quot;contentType&quot;&#xd;
+            }&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;titleInfo&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;title&quot;,&#xd;
+                    &quot;value&quot;: &quot;${__UUID()}&quot;&#xd;
+                }&#xd;
+            ],&#xd;
+            &quot;attributes&quot;: {&#xd;
+                &quot;lang&quot;: &quot;swe&quot;&#xd;
+            }&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;originInfo&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;dateIssued&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;year&quot;,&#xd;
+                            &quot;value&quot;: &quot;2000&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                }&#xd;
+            ]&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;classification&quot;,&#xd;
+            &quot;repeatId&quot;: &quot;0&quot;,&#xd;
+            &quot;value&quot;: &quot;1&quot;,&#xd;
+            &quot;attributes&quot;: {&#xd;
+                &quot;authority&quot;: &quot;ssif&quot;&#xd;
+            }&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;adminInfo&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;note&quot;,&#xd;
+                    &quot;value&quot;: &quot;some note&quot;,&#xd;
+                    &quot;attributes&quot;: {&#xd;
+                        &quot;type&quot;: &quot;internal&quot;&#xd;
+                    }&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;reviewed&quot;,&#xd;
+                    &quot;value&quot;: &quot;true&quot;&#xd;
+                }&#xd;
+            ]&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;name&quot;,&#xd;
+            &quot;repeatId&quot;: &quot;14&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;namePart&quot;,&#xd;
+                    &quot;value&quot;: &quot;${__UUID()}&quot;,&#xd;
+                    &quot;attributes&quot;: {&#xd;
+                        &quot;type&quot;: &quot;family&quot;&#xd;
+                    }&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;role&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;roleTerm&quot;,&#xd;
+                            &quot;value&quot;: &quot;aut&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;person&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;diva-person&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;${personId}&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                }&#xd;
+            ],&#xd;
+            &quot;attributes&quot;: {&#xd;
+                &quot;type&quot;: &quot;personal&quot;&#xd;
+            }&#xd;
+        }&#xd;
+    ]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordgroup+json</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+              <stringProp name="XPathExtractor.default"></stringProp>
+              <stringProp name="XPathExtractor.refname">paperId</stringProp>
+              <stringProp name="XPathExtractor.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor.xpathQuery">//recordInfo/id/text()</stringProp>
+              <boolProp name="XPathExtractor.validate">false</boolProp>
+              <boolProp name="XPathExtractor.tolerant">false</boolProp>
+              <boolProp name="XPathExtractor.namespace">false</boolProp>
+            </XPathExtractor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert paperId extracted" enabled="true">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">def id = vars.get(&quot;paperId&quot;)
+
+if (id == null || id.trim().isEmpty()) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Failed to extract id from created diva-output, cannot proceed with tests&quot;)
+}</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Read paper (diva-output)" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Read paper (diva-output)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-output/${paperId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update paper (diva-output)" enabled="true"/>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">vars.put(&quot;newUuidPaper&quot;, java.util.UUID.randomUUID().toString())</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Update paper (diva-output)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-output/${paperId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;output&gt;&#xd;
+    &lt;recordInfo&gt;&#xd;
+        &lt;ignoreOverwriteProtection&gt;true&lt;/ignoreOverwriteProtection&gt;&#xd;
+        &lt;validationType&gt;&#xd;
+            &lt;linkedRecordType&gt;validationType&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;conference_paper&lt;/linkedRecordId&gt;&#xd;
+        &lt;/validationType&gt;&#xd;
+        &lt;dataDivider&gt;&#xd;
+            &lt;linkedRecordType&gt;system&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;divaData&lt;/linkedRecordId&gt;&#xd;
+        &lt;/dataDivider&gt;&#xd;
+        &lt;permissionUnit&gt;&#xd;
+            &lt;linkedRecordType&gt;permissionUnit&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;nationalmuseum&lt;/linkedRecordId&gt;&#xd;
+        &lt;/permissionUnit&gt;&#xd;
+        &lt;visibility&gt;published&lt;/visibility&gt;&#xd;
+        &lt;tsVisibility&gt;2026-04-14T11:31:54.780467Z&lt;/tsVisibility&gt;&#xd;
+        &lt;inTrashBin&gt;false&lt;/inTrashBin&gt;&#xd;
+        &lt;id&gt;61&lt;/id&gt;&#xd;
+        &lt;type&gt;&#xd;
+            &lt;linkedRecordType&gt;recordType&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;diva-output&lt;/linkedRecordId&gt;&#xd;
+        &lt;/type&gt;&#xd;
+        &lt;updated repeatId=&quot;0&quot;&gt;&#xd;
+            &lt;tsUpdated&gt;2026-04-14T11:31:54.781367Z&lt;/tsUpdated&gt;&#xd;
+            &lt;updatedBy&gt;&#xd;
+                &lt;linkedRecordType&gt;user&lt;/linkedRecordType&gt;&#xd;
+                &lt;linkedRecordId&gt;161616&lt;/linkedRecordId&gt;&#xd;
+            &lt;/updatedBy&gt;&#xd;
+        &lt;/updated&gt;&#xd;
+        &lt;urn&gt;urn:nbn:se:diva-61&lt;/urn&gt;&#xd;
+    &lt;/recordInfo&gt;&#xd;
+    &lt;dataQuality&gt;2026&lt;/dataQuality&gt;&#xd;
+    &lt;genre type=&quot;outputType&quot;&gt;conference_paper&lt;/genre&gt;&#xd;
+    &lt;language repeatId=&quot;0&quot;&gt;&#xd;
+        &lt;languageTerm authority=&quot;iso639-2b&quot; type=&quot;code&quot;&gt;swe&lt;/languageTerm&gt;&#xd;
+    &lt;/language&gt;&#xd;
+    &lt;genre type=&quot;contentType&quot;&gt;ref&lt;/genre&gt;&#xd;
+    &lt;titleInfo lang=&quot;swe&quot;&gt;&#xd;
+        &lt;title&gt;${__UUID()}&lt;/title&gt;&#xd;
+    &lt;/titleInfo&gt;&#xd;
+    &lt;originInfo&gt;&#xd;
+        &lt;dateIssued&gt;&#xd;
+            &lt;year&gt;2000&lt;/year&gt;&#xd;
+        &lt;/dateIssued&gt;&#xd;
+    &lt;/originInfo&gt;&#xd;
+    &lt;classification authority=&quot;ssif&quot; repeatId=&quot;0&quot;&gt;1&lt;/classification&gt;&#xd;
+    &lt;adminInfo&gt;&#xd;
+        &lt;note type=&quot;internal&quot;&gt;some note&lt;/note&gt;&#xd;
+        &lt;reviewed&gt;true&lt;/reviewed&gt;&#xd;
+    &lt;/adminInfo&gt;&#xd;
+    &lt;name repeatId=&quot;14&quot; type=&quot;personal&quot;&gt;&#xd;
+        &lt;namePart type=&quot;family&quot;&gt;${newUuidPaper}&lt;/namePart&gt;&#xd;
+        &lt;role&gt;&#xd;
+            &lt;roleTerm&gt;aut&lt;/roleTerm&gt;&#xd;
+        &lt;/role&gt;&#xd;
+        &lt;person&gt;&#xd;
+            &lt;linkedRecordType&gt;diva-person&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;${personId}&lt;/linkedRecordId&gt;&#xd;
+        &lt;/person&gt;&#xd;
+    &lt;/name&gt;&#xd;
+&lt;/output&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordgroup+xml</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+              <stringProp name="XPathExtractor.default"></stringProp>
+              <stringProp name="XPathExtractor.refname">updatedUuidPaper</stringProp>
+              <stringProp name="XPathExtractor.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor.xpathQuery">//namePart[@type=&apos;family&apos;]/text()</stringProp>
+              <boolProp name="XPathExtractor.validate">false</boolProp>
+              <boolProp name="XPathExtractor.tolerant">false</boolProp>
+              <boolProp name="XPathExtractor.namespace">false</boolProp>
+            </XPathExtractor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">def actual = vars.get(&quot;updatedUuidPaper&quot;)
+def expected = vars.get(&quot;newUuidPaper&quot;)
+
+if (!actual || actual != expected) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(
+        &quot;UUID mismatch. expected=&quot; + expected + &quot; actual=&quot; + actual
+    )
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Search paper" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Search paper (diva-output)" enabled="true">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/searchResult/diva-outputSearch</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="searchData" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">{&quot;name&quot;:&quot;search&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;include&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;includePart&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;genericSearchTerm&quot;,&quot;value&quot;:&quot;**&quot;}]}]}]}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">searchData</stringProp>
+                  <stringProp name="HTTPArgument.content_type">text/plain</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordList-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="ADMIN - Person Test Fragment - Common calls to use as modules for test" enabled="false">
+        <stringProp name="TestPlan.comments">A collection of calls to use in different scenarios. This makes it easier to maintain tests and keep things modular.</stringProp>
+      </TestFragmentController>
+      <hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Create person (diva-person)" enabled="true">
+          <stringProp name="TestPlan.comments">Create a person with minimal data, namePart (family) is set to a random UUID for each person created to avoid conflicts</stringProp>
+        </GenericController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Create person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Create a person with minimal data, namePart (family) is set to a random UUID for each person created to avoid conflicts</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;name&quot;: &quot;person&quot;,&#xd;
+    &quot;children&quot;: [&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;recordInfo&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;validationType&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;validationType&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;diva-person&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;dataDivider&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;system&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;divaData&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                }&#xd;
+            ]&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;authority&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;name&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;namePart&quot;,&#xd;
+                            &quot;value&quot;: &quot;${__UUID()}&quot;,&#xd;
+                            &quot;attributes&quot;: {&#xd;
+                                &quot;type&quot;: &quot;family&quot;&#xd;
+                            }&#xd;
+                        }&#xd;
+                    ],&#xd;
+                    &quot;attributes&quot;: {&#xd;
+                        &quot;type&quot;: &quot;personal&quot;&#xd;
+                    }&#xd;
+                }&#xd;
+            ]&#xd;
+        }&#xd;
+    ]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordgroup+json</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+              <stringProp name="XPathExtractor.default"></stringProp>
+              <stringProp name="XPathExtractor.refname">personId</stringProp>
+              <stringProp name="XPathExtractor.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor.xpathQuery">//recordInfo/id/text()</stringProp>
+              <boolProp name="XPathExtractor.validate">false</boolProp>
+              <boolProp name="XPathExtractor.tolerant">false</boolProp>
+              <boolProp name="XPathExtractor.namespace">false</boolProp>
+            </XPathExtractor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert personId extracted" enabled="true">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">def id = vars.get(&quot;personId&quot;)
+
+if (id == null || id.trim().isEmpty()) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Failed to extract id from created diva-person, cannot proceed with tests&quot;)
+}</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Read person (diva-person)" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Read person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person/${personId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update person (diva-person)" enabled="true"/>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">vars.put(&quot;newUuid&quot;, java.util.UUID.randomUUID().toString())</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Update person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person/${personId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;person&gt;&#xd;
+    &lt;recordInfo&gt;&#xd;
+    &lt;ignoreOverwriteProtection&gt;true&lt;/ignoreOverwriteProtection&gt;&#xd;
+        &lt;validationType&gt;&#xd;
+            &lt;linkedRecordType&gt;validationType&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;diva-person&lt;/linkedRecordId&gt;&#xd;
+        &lt;/validationType&gt;&#xd;
+        &lt;dataDivider&gt;&#xd;
+            &lt;linkedRecordType&gt;system&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;divaData&lt;/linkedRecordId&gt;&#xd;
+        &lt;/dataDivider&gt;&#xd;
+        &lt;inTrashBin&gt;false&lt;/inTrashBin&gt;&#xd;
+        &lt;id&gt;${personId}&lt;/id&gt;&#xd;
+        &lt;type&gt;&#xd;
+            &lt;linkedRecordType&gt;recordType&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;diva-person&lt;/linkedRecordId&gt;&#xd;
+        &lt;/type&gt;&#xd;
+        &lt;updated repeatId=&quot;0&quot;&gt;&#xd;
+            &lt;tsUpdated&gt;2026-04-13T12:32:35.511930Z&lt;/tsUpdated&gt;&#xd;
+            &lt;updatedBy&gt;&#xd;
+                &lt;linkedRecordType&gt;user&lt;/linkedRecordType&gt;&#xd;
+                &lt;linkedRecordId&gt;161616&lt;/linkedRecordId&gt;&#xd;
+                &#xd;
+            &lt;/updatedBy&gt;&#xd;
+        &lt;/updated&gt;&#xd;
+    &lt;/recordInfo&gt;&#xd;
+    &lt;authority&gt;&#xd;
+        &lt;name type=&quot;personal&quot;&gt;&#xd;
+            &lt;namePart type=&quot;family&quot;&gt;${newUuid}&lt;/namePart&gt;&#xd;
+        &lt;/name&gt;&#xd;
+    &lt;/authority&gt;&#xd;
+&lt;/person&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordgroup+xml</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+              <stringProp name="XPathExtractor.default"></stringProp>
+              <stringProp name="XPathExtractor.refname">updatedUuid</stringProp>
+              <stringProp name="XPathExtractor.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor.xpathQuery">//namePart[@type=&apos;family&apos;]/text()</stringProp>
+              <boolProp name="XPathExtractor.validate">false</boolProp>
+              <boolProp name="XPathExtractor.tolerant">false</boolProp>
+              <boolProp name="XPathExtractor.namespace">false</boolProp>
+            </XPathExtractor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">def actual = vars.get(&quot;updatedUuid&quot;)
+def expected = vars.get(&quot;newUuid&quot;)
+
+if (!actual || actual != expected) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(
+        &quot;UUID mismatch. expected=&quot; + expected + &quot; actual=&quot; + actual
+    )
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="DELETE - Delete person" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Delete person (diva-person)" enabled="true">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person/${personId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Search person" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Search person (diva-person)" enabled="true">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/searchResult/diva-personSearch</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="searchData" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">{&quot;name&quot;:&quot;search&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;include&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;includePart&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;genericSearchTerm&quot;,&quot;value&quot;:&quot;**&quot;}]}]}]}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">searchData</stringProp>
+                  <stringProp name="HTTPArgument.content_type">text/plain</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">authtoken</stringProp>
+                  <stringProp name="Header.value">${authtoken}</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordList-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="GUEST - Person Test Fragment - Common calls to use as modules for test" enabled="false">
+        <stringProp name="TestPlan.comments">A collection of calls to use in different scenarios. This makes it easier to maintain tests and keep things modular.</stringProp>
+      </TestFragmentController>
+      <hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Create person (diva-person)" enabled="true">
+          <stringProp name="TestPlan.comments">Create a person with minimal data, namePart (family) is set to a random UUID for each person created to avoid conflicts</stringProp>
+        </GenericController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GUEST Create person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Create a person with minimal data, namePart (family) is set to a random UUID for each person created to avoid conflicts</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+    &quot;name&quot;: &quot;person&quot;,&#xd;
+    &quot;children&quot;: [&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;recordInfo&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;validationType&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;validationType&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;diva-person&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                },&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;dataDivider&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
+                            &quot;value&quot;: &quot;system&quot;&#xd;
+                        },&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
+                            &quot;value&quot;: &quot;divaData&quot;&#xd;
+                        }&#xd;
+                    ]&#xd;
+                }&#xd;
+            ]&#xd;
+        },&#xd;
+        {&#xd;
+            &quot;name&quot;: &quot;authority&quot;,&#xd;
+            &quot;children&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;name&quot;,&#xd;
+                    &quot;children&quot;: [&#xd;
+                        {&#xd;
+                            &quot;name&quot;: &quot;namePart&quot;,&#xd;
+                            &quot;value&quot;: &quot;${__UUID()}&quot;,&#xd;
+                            &quot;attributes&quot;: {&#xd;
+                                &quot;type&quot;: &quot;family&quot;&#xd;
+                            }&#xd;
+                        }&#xd;
+                    ],&#xd;
+                    &quot;attributes&quot;: {&#xd;
+                        &quot;type&quot;: &quot;personal&quot;&#xd;
+                    }&#xd;
+                }&#xd;
+            ]&#xd;
+        }&#xd;
+    ]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordgroup+json</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Read person (diva-person)" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GUEST Read person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person/${personId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update person (diva-person)" enabled="true"/>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">vars.put(&quot;newUuid&quot;, java.util.UUID.randomUUID().toString())</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GUEST Update person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person/${personId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;person&gt;&#xd;
+    &lt;recordInfo&gt;&#xd;
+    &lt;ignoreOverwriteProtection&gt;true&lt;/ignoreOverwriteProtection&gt;&#xd;
+        &lt;validationType&gt;&#xd;
+            &lt;linkedRecordType&gt;validationType&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;diva-person&lt;/linkedRecordId&gt;&#xd;
+        &lt;/validationType&gt;&#xd;
+        &lt;dataDivider&gt;&#xd;
+            &lt;linkedRecordType&gt;system&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;divaData&lt;/linkedRecordId&gt;&#xd;
+        &lt;/dataDivider&gt;&#xd;
+        &lt;inTrashBin&gt;false&lt;/inTrashBin&gt;&#xd;
+        &lt;id&gt;${personId}&lt;/id&gt;&#xd;
+        &lt;type&gt;&#xd;
+            &lt;linkedRecordType&gt;recordType&lt;/linkedRecordType&gt;&#xd;
+            &lt;linkedRecordId&gt;diva-person&lt;/linkedRecordId&gt;&#xd;
+        &lt;/type&gt;&#xd;
+        &lt;updated repeatId=&quot;0&quot;&gt;&#xd;
+            &lt;tsUpdated&gt;2026-04-13T12:32:35.511930Z&lt;/tsUpdated&gt;&#xd;
+            &lt;updatedBy&gt;&#xd;
+                &lt;linkedRecordType&gt;user&lt;/linkedRecordType&gt;&#xd;
+                &lt;linkedRecordId&gt;161616&lt;/linkedRecordId&gt;&#xd;
+                &#xd;
+            &lt;/updatedBy&gt;&#xd;
+        &lt;/updated&gt;&#xd;
+    &lt;/recordInfo&gt;&#xd;
+    &lt;authority&gt;&#xd;
+        &lt;name type=&quot;personal&quot;&gt;&#xd;
+            &lt;namePart type=&quot;family&quot;&gt;${newUuid}&lt;/namePart&gt;&#xd;
+        &lt;/name&gt;&#xd;
+    &lt;/authority&gt;&#xd;
+&lt;/person&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordgroup+xml</stringProp>
+                </elementProp>
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="DELETE - Delete person" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GUEST Delete person (diva-person)" enabled="true">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-person/${personId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Search person" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="USER Search person (diva-person)" enabled="true">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/searchResult/diva-personSearch</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="searchData" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">{&quot;name&quot;:&quot;search&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;include&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;includePart&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;genericSearchTerm&quot;,&quot;value&quot;:&quot;**&quot;}]}]}]}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">searchData</stringProp>
+                  <stringProp name="HTTPArgument.content_type">text/plain</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordList-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="GUEST - Output Test Fragment - Common calls to use as modules for test" enabled="false"/>
+      <hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Search paper" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="USER Search paper (diva-output)" enabled="true">
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/searchResult/diva-outputSearch</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="searchData" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">{&quot;name&quot;:&quot;search&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;include&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;includePart&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;genericSearchTerm&quot;,&quot;value&quot;:&quot;**&quot;}]}]}]}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">searchData</stringProp>
+                  <stringProp name="HTTPArgument.content_type">text/plain</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Accept</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.recordList-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Read paper (diva-output)" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="USER Read person (diva-person)" enabled="true">
+            <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
+            <stringProp name="HTTPSampler.path">/rest/record/diva-output/${paperId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/vnd.cora.record-decorated+xml</stringProp>
+                </elementProp>
+              </collectionProp>
+              <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Assertion Fragments" enabled="false">
+        <stringProp name="TestPlan.comments">Selection of assertions for tests</stringProp>
+      </TestFragmentController>
+      <hashTree>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code Assertion 201" enabled="true">
+          <collectionProp name="Asserion.test_strings">
+            <stringProp name="49587">201</stringProp>
+          </collectionProp>
+          <stringProp name="Assertion.custom_message">Failed to login, response code != 201</stringProp>
+          <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+          <boolProp name="Assertion.assume_success">false</boolProp>
+          <intProp name="Assertion.test_type">8</intProp>
+        </ResponseAssertion>
+        <hashTree/>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code assertion 200" enabled="true">
+          <collectionProp name="Asserion.test_strings">
+            <stringProp name="49586">200</stringProp>
+          </collectionProp>
+          <stringProp name="Assertion.custom_message">Call did not return the expected response code (200)</stringProp>
+          <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+          <boolProp name="Assertion.assume_success">false</boolProp>
+          <intProp name="Assertion.test_type">8</intProp>
+        </ResponseAssertion>
+        <hashTree/>
+        <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion for 404" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="script">if (prev.getResponseCode() != &quot;404&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Expected 404 but got &quot; + prev.getResponseCode())
+} else {
+    prev.setSuccessful(true)
+}</stringProp>
+        </JSR223Assertion>
+        <hashTree/>
+        <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion for 401" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="script">if (prev.getResponseCode() != &quot;401&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Expected 401 but got &quot; + prev.getResponseCode())
+} else {
+    prev.setSuccessful(true)
+}</stringProp>
+        </JSR223Assertion>
+        <hashTree/>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>true</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Health check group">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="AUTH - Once only"/>
+        <hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="AUTH - Apptoken login">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-1464086450">Common fragments</stringProp>
+              <stringProp name="905988492">AUTH - Apptoken Login</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree/>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="ADMIN - CRUD - diva-person" enabled="true"/>
+        <hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-416475370">ADMIN - Person Test Fragment - Common calls to use as modules for test</stringProp>
+              <stringProp name="1097505477">POST - Create person (diva-person)</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code assertion 201" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49587">201</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Bad response code != 201</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-416475370">ADMIN - Person Test Fragment - Common calls to use as modules for test</stringProp>
+              <stringProp name="305947457">GET - Read person (diva-person)</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code assertion 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Call did not return the expected response code (200)</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update diva-person" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-416475370">ADMIN - Person Test Fragment - Common calls to use as modules for test</stringProp>
+              <stringProp name="-1053108968">POST - Update person (diva-person)</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code assertion 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Call did not return the expected response code (200)</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Delete diva-person" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-416475370">ADMIN - Person Test Fragment - Common calls to use as modules for test</stringProp>
+              <stringProp name="-322803678">DELETE - Delete person</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code assertion 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Call did not return the expected response code (200)</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="ADMIN Verify person was deleted" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">false</boolProp>
+          </TransactionController>
+          <hashTree>
+            <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person (404 expected)" enabled="true">
+              <collectionProp name="ModuleController.node_path">
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="-416475370">ADMIN - Person Test Fragment - Common calls to use as modules for test</stringProp>
+                <stringProp name="305947457">GET - Read person (diva-person)</stringProp>
+              </collectionProp>
+            </ModuleController>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion for 404" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">if (prev.getResponseCode() != &quot;404&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Expected 404 but got &quot; + prev.getResponseCode())
+} else {
+    prev.setSuccessful(true)
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GUEST - CRUD - diva-person" enabled="true"/>
+        <hashTree>
+          <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Create record for GUEST tests" enabled="true"/>
+          <hashTree>
+            <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create person record" enabled="true">
+              <collectionProp name="ModuleController.node_path">
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="-416475370">ADMIN - Person Test Fragment - Common calls to use as modules for test</stringProp>
+                <stringProp name="1097505477">POST - Create person (diva-person)</stringProp>
+              </collectionProp>
+            </ModuleController>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="GUEST Create person (expect 401)" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">false</boolProp>
+          </TransactionController>
+          <hashTree>
+            <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+              <collectionProp name="ModuleController.node_path">
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="1914045869">GUEST - Person Test Fragment - Common calls to use as modules for test</stringProp>
+                <stringProp name="1097505477">POST - Create person (diva-person)</stringProp>
+              </collectionProp>
+            </ModuleController>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion for 401" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">if (prev.getResponseCode() != &quot;401&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Expected 401 but got &quot; + prev.getResponseCode())
+} else {
+    prev.setSuccessful(true)
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="1914045869">GUEST - Person Test Fragment - Common calls to use as modules for test</stringProp>
+              <stringProp name="305947457">GET - Read person (diva-person)</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response code assertion 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message">Call did not return the expected response code (200)</stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="GUEST Update person (expect 401)" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">false</boolProp>
+          </TransactionController>
+          <hashTree>
+            <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update diva-person" enabled="true">
+              <collectionProp name="ModuleController.node_path">
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="1914045869">GUEST - Person Test Fragment - Common calls to use as modules for test</stringProp>
+                <stringProp name="-1053108968">POST - Update person (diva-person)</stringProp>
+              </collectionProp>
+            </ModuleController>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion for 401" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">if (prev.getResponseCode() != &quot;401&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Expected 401 but got &quot; + prev.getResponseCode())
+} else {
+    prev.setSuccessful(true)
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="GUEST Delete person (expect 401)" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">false</boolProp>
+          </TransactionController>
+          <hashTree>
+            <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Delete diva-person" enabled="true">
+              <collectionProp name="ModuleController.node_path">
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="764597751">Test Plan</stringProp>
+                <stringProp name="1914045869">GUEST - Person Test Fragment - Common calls to use as modules for test</stringProp>
+                <stringProp name="-322803678">DELETE - Delete person</stringProp>
+              </collectionProp>
+            </ModuleController>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion for 401" enabled="true">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">if (prev.getResponseCode() != &quot;401&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Expected 401 but got &quot; + prev.getResponseCode())
+} else {
+    prev.setSuccessful(true)
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
