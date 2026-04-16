@@ -101,7 +101,7 @@ print_test_info() {
 
 run_jmeter() {
     jmeter -n \
-        -t ./tests/crud-load.jmx \
+        -t ./tests/load.jmx \
         -JPROTOCOL="$PROTOCOL" \
         -JHOST="$HOST" \
         -JPORT="$PORT" \

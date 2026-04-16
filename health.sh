@@ -1,12 +1,16 @@
 #!/bin/bash
+
 PROFILE="health"
 PROFILE_FILE="./profiles/${PROFILE}.env"
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+TIMESTAMP=$(date +%Y%m%d-[%H%M%S])
 
 #Output
-RESULTS_DIR="./results/${PROFILE}"
-REPORTS_DIR="./reports/${PROFILE}"
-LOG_DIR="./logs/${PROFILE}"
+OUTPUT_DIR="./output/${PROFILE}/${TIMESTAMP}"
+
+RESULTS_DIR="${OUTPUT_DIR}/results"
+REPORTS_DIR="${OUTPUT_DIR}/report"
+LOG_DIR="${OUTPUT_DIR}/logs"
+FAILED_RESPONSE_DIR="${OUTPUT_DIR}/failed"
 
 start_test() {
 	load_test_profile
@@ -88,9 +92,9 @@ run_jmeter() {
 		-JPORT="$PORT" \
 		-JADMIN_USER="$ADMIN_USER" \
 		-JADMIN_APPTOKEN="$ADMIN_APPTOKEN" \
-		-l "$RESULTS_DIR/${PROFILE}-${TIMESTAMP}.jtl" \
-		-j "$LOG_DIR/${PROFILE}-${TIMESTAMP}.log" \
-		-e -o "$REPORTS_DIR/${PROFILE}-${TIMESTAMP}"
+        -l "$RESULTS_DIR/results.jtl" \
+        -j "$LOG_DIR/jmeter.log" \
+        -e -o "$REPORTS_DIR"
 }
 
 start_test
