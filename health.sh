@@ -1,5 +1,6 @@
 #!/bin/bash
 PROFILE="health"
+PROFILE_FILE="./profiles/${PROFILE}.env"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
 #Output
@@ -22,16 +23,16 @@ load_test_profile() {
 	source "$PROFILE_FILE"
 	set +a
 
-	# Load local envs (for dev use only)
-	if [ -f env.local ]; then
+    # Load local env (for dev use only)
+	if [ -f "./env.local" ]; then
 		set -a
-		source env.local
+		source ./env.local
 		set +a
 	fi
 }
 
 validate_profile_exists() {
-	if [ ! -f "./profiles/${PROFILE}.env" ]; then
+	if [ ! -f "$PROFILE_FILE" ]; then
 		echo "Could not find: $PROFILE profile"
 		echo ""
 		list_profiles
