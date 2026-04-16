@@ -43,11 +43,11 @@
       <hashTree/>
       <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Common fragments" enabled="false"/>
       <hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="AUTH - Apptoken Login">
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="AUTH - Apptoken Login" enabled="true">
           <stringProp name="TestPlan.comments">Used to login to the system using apptoken, extract and assign the returned authtoken as a variable ${authtoken}</stringProp>
         </GenericController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login" enabled="true">
             <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
             <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
             <stringProp name="HTTPSampler.protocol">${__P(PROTOCOL,${PROTOCOL})}</stringProp>
@@ -1330,10 +1330,10 @@ if (!actual || actual != expected) {
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Load test group" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">${__P(LOAD,10)}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">${__P(RAMP,60)}</stringProp>
-        <stringProp name="ThreadGroup.duration">${__P(DURATION,900)}</stringProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Load test group">
+        <stringProp name="ThreadGroup.num_threads">${__P(USER_LOAD,10)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(RAMP_SECONDS,60)}</stringProp>
+        <stringProp name="ThreadGroup.duration">${__P(DURATION_SECONDS,900)}</stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -1397,9 +1397,9 @@ if (!actual || actual != expected) {
             <hashTree/>
           </hashTree>
         </hashTree>
-        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Simulate &quot;realistic&quot; user timings" enabled="true">
-          <stringProp name="ConstantTimer.delay">${__P(PACING_BASE,0)}</stringProp>
-          <stringProp name="RandomTimer.range">${__P(PACING_VARIANCE,0)}</stringProp>
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Simulate &quot;realistic&quot; user timings">
+          <stringProp name="ConstantTimer.delay">${__P(PACING_VARIANCE_MILLIS,0)}</stringProp>
+          <stringProp name="RandomTimer.range">${__P(PACING_BASE_MILLIS,0)}</stringProp>
         </UniformRandomTimer>
         <hashTree/>
         <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Call Controller" enabled="true">
