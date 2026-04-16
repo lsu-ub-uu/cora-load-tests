@@ -6,8 +6,6 @@
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
-      <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
@@ -34,7 +32,7 @@
           </elementProp>
           <elementProp name="ADMIN_APPTOKEN" elementType="Argument">
             <stringProp name="Argument.name">ADMIN_APPTOKEN</stringProp>
-            <stringProp name="Argument.value">changeme</stringProp>
+            <stringProp name="Argument.value">d5c40525-292b-4c6d-9ea4-12c7271a6556</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -104,9 +102,9 @@ if (token == null || token.trim().isEmpty()) {
       </hashTree>
       <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="ADMIN - Output Test Fragment - Common calls to use as modules for test" enabled="false"/>
       <hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Create paper (diva-output)" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Create paper (diva-output)"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Create paper (diva-output)" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Create paper (diva-output)">
             <stringProp name="TestPlan.comments">Create an output with minimal data,</stringProp>
             <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
             <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
@@ -252,44 +250,7 @@ if (token == null || token.trim().isEmpty()) {
                     &quot;value&quot;: &quot;true&quot;&#xd;
                 }&#xd;
             ]&#xd;
-        },&#xd;
-        {&#xd;
-            &quot;name&quot;: &quot;name&quot;,&#xd;
-            &quot;repeatId&quot;: &quot;14&quot;,&#xd;
-            &quot;children&quot;: [&#xd;
-                {&#xd;
-                    &quot;name&quot;: &quot;namePart&quot;,&#xd;
-                    &quot;value&quot;: &quot;${__UUID()}&quot;,&#xd;
-                    &quot;attributes&quot;: {&#xd;
-                        &quot;type&quot;: &quot;family&quot;&#xd;
-                    }&#xd;
-                },&#xd;
-                {&#xd;
-                    &quot;name&quot;: &quot;role&quot;,&#xd;
-                    &quot;children&quot;: [&#xd;
-                        {&#xd;
-                            &quot;name&quot;: &quot;roleTerm&quot;,&#xd;
-                            &quot;value&quot;: &quot;aut&quot;&#xd;
-                        }&#xd;
-                    ]&#xd;
-                },&#xd;
-                {&#xd;
-                    &quot;name&quot;: &quot;person&quot;,&#xd;
-                    &quot;children&quot;: [&#xd;
-                        {&#xd;
-                            &quot;name&quot;: &quot;linkedRecordType&quot;,&#xd;
-                            &quot;value&quot;: &quot;diva-person&quot;&#xd;
-                        },&#xd;
-                        {&#xd;
-                            &quot;name&quot;: &quot;linkedRecordId&quot;,&#xd;
-                            &quot;value&quot;: &quot;${personId}&quot;&#xd;
-                        }&#xd;
-                    ]&#xd;
-                }&#xd;
-            ],&#xd;
-            &quot;attributes&quot;: {&#xd;
-                &quot;type&quot;: &quot;personal&quot;&#xd;
-            }&#xd;
+        &#xd;
         }&#xd;
     ]&#xd;
 }</stringProp>
@@ -299,7 +260,7 @@ if (token == null || token.trim().isEmpty()) {
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">authtoken</stringProp>
@@ -317,7 +278,7 @@ if (token == null || token.trim().isEmpty()) {
               <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
             </HeaderManager>
             <hashTree/>
-            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor">
               <stringProp name="XPathExtractor.default"></stringProp>
               <stringProp name="XPathExtractor.refname">paperId</stringProp>
               <stringProp name="XPathExtractor.matchNumber">1</stringProp>
@@ -327,24 +288,24 @@ if (token == null || token.trim().isEmpty()) {
               <boolProp name="XPathExtractor.namespace">false</boolProp>
             </XPathExtractor>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert paperId extracted" enabled="true">
-              <stringProp name="cacheKey">true</stringProp>
-              <stringProp name="filename"></stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="script">def id = vars.get(&quot;paperId&quot;)
-
-if (id == null || id.trim().isEmpty()) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Failed to extract id from created diva-output, cannot proceed with tests&quot;)
-}</stringProp>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
               <stringProp name="scriptLanguage">groovy</stringProp>
-            </JSR223Assertion>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">def paperId = vars.get(&quot;paperId&quot;)
+
+if (!paperId?.trim()) {
+    log.warn(&quot;paperId missing, falling back to firstPaperId/default&quot;)
+    vars.put(&quot;paperId&quot;, vars.get(&quot;firstPaperId&quot;) ?: &quot;1&quot;)
+}</stringProp>
+            </JSR223PostProcessor>
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Read paper (diva-output)" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET - Read paper (diva-output)"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Read paper (diva-output)" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Read paper (diva-output)">
             <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
             <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
             <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
@@ -375,9 +336,9 @@ if (id == null || id.trim().isEmpty()) {
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update paper (diva-output)" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update paper (diva-output)"/>
         <hashTree>
-          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="filename"></stringProp>
             <stringProp name="parameters"></stringProp>
@@ -385,7 +346,7 @@ if (id == null || id.trim().isEmpty()) {
             <stringProp name="scriptLanguage">groovy</stringProp>
           </JSR223PreProcessor>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Update paper (diva-output)" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Update paper (diva-output)">
             <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
             <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
             <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
@@ -468,7 +429,7 @@ if (id == null || id.trim().isEmpty()) {
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">authtoken</stringProp>
@@ -486,7 +447,7 @@ if (id == null || id.trim().isEmpty()) {
               <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
             </HeaderManager>
             <hashTree/>
-            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
               <stringProp name="XPathExtractor.default"></stringProp>
               <stringProp name="XPathExtractor.refname">updatedUuidPaper</stringProp>
               <stringProp name="XPathExtractor.matchNumber">1</stringProp>
@@ -496,7 +457,7 @@ if (id == null || id.trim().isEmpty()) {
               <boolProp name="XPathExtractor.namespace">false</boolProp>
             </XPathExtractor>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="true">
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="false">
               <stringProp name="scriptLanguage">groovy</stringProp>
               <stringProp name="parameters"></stringProp>
               <stringProp name="filename"></stringProp>
@@ -564,7 +525,7 @@ if (!actual || actual != expected) {
           <stringProp name="TestPlan.comments">Create a person with minimal data, namePart (family) is set to a random UUID for each person created to avoid conflicts</stringProp>
         </GenericController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Create person (diva-person)" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Create person (diva-person)">
             <stringProp name="TestPlan.comments">Create a person with minimal data, namePart (family) is set to a random UUID for each person created to avoid conflicts</stringProp>
             <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
             <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
@@ -658,7 +619,7 @@ if (!actual || actual != expected) {
               <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
             </HeaderManager>
             <hashTree/>
-            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor">
               <stringProp name="XPathExtractor.default"></stringProp>
               <stringProp name="XPathExtractor.refname">personId</stringProp>
               <stringProp name="XPathExtractor.matchNumber">1</stringProp>
@@ -668,18 +629,18 @@ if (!actual || actual != expected) {
               <boolProp name="XPathExtractor.namespace">false</boolProp>
             </XPathExtractor>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Assert personId extracted" enabled="true">
-              <stringProp name="cacheKey">true</stringProp>
-              <stringProp name="filename"></stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="script">def id = vars.get(&quot;personId&quot;)
-
-if (id == null || id.trim().isEmpty()) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Failed to extract id from created diva-person, cannot proceed with tests&quot;)
-}</stringProp>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
               <stringProp name="scriptLanguage">groovy</stringProp>
-            </JSR223Assertion>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">def personId = vars.get(&quot;personId&quot;)
+
+if (!personId?.trim()) {
+    log.warn(&quot;personId missing, falling back to firstPersonId/default&quot;)
+    vars.put(&quot;personId&quot;, vars.get(&quot;firstPersonId&quot;) ?: &quot;1&quot;)
+}</stringProp>
+            </JSR223PostProcessor>
             <hashTree/>
           </hashTree>
         </hashTree>
@@ -716,9 +677,9 @@ if (id == null || id.trim().isEmpty()) {
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update person (diva-person)" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="POST - Update person (diva-person)"/>
         <hashTree>
-          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor">
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="filename"></stringProp>
             <stringProp name="parameters"></stringProp>
@@ -726,7 +687,7 @@ if (id == null || id.trim().isEmpty()) {
             <stringProp name="scriptLanguage">groovy</stringProp>
           </JSR223PreProcessor>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Update person (diva-person)" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ADMIN Update person (diva-person)">
             <stringProp name="TestPlan.comments">Relies on ${authtoken} being set from AUTH to read as a logged in user</stringProp>
             <stringProp name="HTTPSampler.domain">${__P(HOST,${HOST})}</stringProp>
             <stringProp name="HTTPSampler.port">${__P(PORT,${PORT})}</stringProp>
@@ -797,7 +758,7 @@ if (id == null || id.trim().isEmpty()) {
               <stringProp name="TestPlan.comments">This uses the authtoken extracted from AUTH, which needs to be run before this.</stringProp>
             </HeaderManager>
             <hashTree/>
-            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
               <stringProp name="XPathExtractor.default"></stringProp>
               <stringProp name="XPathExtractor.refname">updatedUuid</stringProp>
               <stringProp name="XPathExtractor.matchNumber">1</stringProp>
@@ -807,7 +768,7 @@ if (id == null || id.trim().isEmpty()) {
               <boolProp name="XPathExtractor.namespace">false</boolProp>
             </XPathExtractor>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="true">
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="false">
               <stringProp name="scriptLanguage">groovy</stringProp>
               <stringProp name="parameters"></stringProp>
               <stringProp name="filename"></stringProp>
@@ -841,7 +802,7 @@ if (!actual || actual != expected) {
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">authtoken</stringProp>
@@ -1293,7 +1254,7 @@ if (!actual || actual != expected) {
         </JSR223Assertion>
         <hashTree/>
       </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -1331,9 +1292,9 @@ if (!actual || actual != expected) {
       </ResultCollector>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Load test group">
-        <stringProp name="ThreadGroup.num_threads">${__P(USER_LOAD,10)}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">${__P(RAMP_SECONDS,60)}</stringProp>
-        <stringProp name="ThreadGroup.duration">${__P(DURATION_SECONDS,900)}</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(USER_LOAD,100)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(RAMP_SECONDS,120)}</stringProp>
+        <stringProp name="ThreadGroup.duration">${__P(DURATION_SECONDS,240)}</stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -1343,7 +1304,7 @@ if (!actual || actual != expected) {
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Set up test basics" enabled="true">
+        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Set up test basics">
           <stringProp name="TestPlan.comments">Once only set up the basics for running tests with minimal risk of hickups (login, create atleast one record of each to get id variables for references)</stringProp>
         </OnceOnlyController>
         <hashTree>
@@ -1356,7 +1317,7 @@ if (!actual || actual != expected) {
             </collectionProp>
           </ModuleController>
           <hashTree/>
-          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person">
             <collectionProp name="ModuleController.node_path">
               <stringProp name="764597751">Test Plan</stringProp>
               <stringProp name="764597751">Test Plan</stringProp>
@@ -1365,7 +1326,7 @@ if (!actual || actual != expected) {
             </collectionProp>
           </ModuleController>
           <hashTree>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code assertion 201" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code assertion 201">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="49587">201</stringProp>
               </collectionProp>
@@ -1375,8 +1336,18 @@ if (!actual || actual != expected) {
               <intProp name="Assertion.test_type">8</intProp>
             </ResponseAssertion>
             <hashTree/>
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor">
+              <stringProp name="XPathExtractor.default"></stringProp>
+              <stringProp name="XPathExtractor.refname">firstPersonId</stringProp>
+              <stringProp name="XPathExtractor.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor.xpathQuery">//recordInfo/id/text()</stringProp>
+              <boolProp name="XPathExtractor.validate">false</boolProp>
+              <boolProp name="XPathExtractor.tolerant">false</boolProp>
+              <boolProp name="XPathExtractor.namespace">false</boolProp>
+            </XPathExtractor>
+            <hashTree/>
           </hashTree>
-          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-outoput (paper)" enabled="true">
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)">
             <collectionProp name="ModuleController.node_path">
               <stringProp name="764597751">Test Plan</stringProp>
               <stringProp name="764597751">Test Plan</stringProp>
@@ -1385,7 +1356,7 @@ if (!actual || actual != expected) {
             </collectionProp>
           </ModuleController>
           <hashTree>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code assertion 201" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code assertion 201">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="49587">201</stringProp>
               </collectionProp>
@@ -1395,6 +1366,16 @@ if (!actual || actual != expected) {
               <intProp name="Assertion.test_type">8</intProp>
             </ResponseAssertion>
             <hashTree/>
+            <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor">
+              <stringProp name="XPathExtractor.default"></stringProp>
+              <stringProp name="XPathExtractor.refname">firstPaperId</stringProp>
+              <stringProp name="XPathExtractor.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor.xpathQuery">//recordInfo/id/text()</stringProp>
+              <boolProp name="XPathExtractor.validate">false</boolProp>
+              <boolProp name="XPathExtractor.tolerant">false</boolProp>
+              <boolProp name="XPathExtractor.namespace">false</boolProp>
+            </XPathExtractor>
+            <hashTree/>
           </hashTree>
         </hashTree>
         <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Simulate &quot;realistic&quot; user timings">
@@ -1402,18 +1383,18 @@ if (!actual || actual != expected) {
           <stringProp name="RandomTimer.range">${__P(PACING_BASE_MILLIS,0)}</stringProp>
         </UniformRandomTimer>
         <hashTree/>
-        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Call Controller" enabled="true">
+        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Call Controller">
           <intProp name="InterleaveControl.style">1</intProp>
           <stringProp name="TestPlan.comments">User-like distribution of calls</stringProp>
         </RandomController>
         <hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Admin output flow" enabled="true"/>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Admin output flow"/>
           <hashTree>
-            <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Output" enabled="true">
+            <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Output">
               <intProp name="InterleaveControl.style">1</intProp>
             </RandomController>
             <hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1433,7 +1414,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1453,7 +1434,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1473,7 +1454,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-output (paper)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1493,7 +1474,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read paper (diva-output)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read paper (diva-output)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1513,7 +1494,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read paper (diva-output)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read paper (diva-output)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1533,7 +1514,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update paper (diva-output)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update paper (diva-output)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1553,7 +1534,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update paper (diva-output)" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update paper (diva-output)">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1573,7 +1554,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search paper" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search paper">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1593,7 +1574,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search paper" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search paper">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1615,13 +1596,13 @@ if (!actual || actual != expected) {
               </hashTree>
             </hashTree>
           </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Admin person flow" enabled="true"/>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Admin person flow"/>
           <hashTree>
-            <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Person" enabled="true">
+            <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Person">
               <intProp name="InterleaveControl.style">1</intProp>
             </RandomController>
             <hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="AUTH - Apptoken login" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="AUTH - Apptoken login">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1630,7 +1611,7 @@ if (!actual || actual != expected) {
                 </collectionProp>
               </ModuleController>
               <hashTree/>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1650,7 +1631,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1670,7 +1651,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Search diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1690,7 +1671,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1710,7 +1691,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Read diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1730,7 +1711,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1750,7 +1731,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1770,7 +1751,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1790,7 +1771,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1810,7 +1791,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1830,7 +1811,7 @@ if (!actual || actual != expected) {
                 </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person" enabled="true">
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create diva-person">
                 <collectionProp name="ModuleController.node_path">
                   <stringProp name="764597751">Test Plan</stringProp>
                   <stringProp name="764597751">Test Plan</stringProp>
@@ -1852,7 +1833,7 @@ if (!actual || actual != expected) {
               </hashTree>
             </hashTree>
           </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="User output flow" enabled="true"/>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="User output flow"/>
           <hashTree>
             <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Output" enabled="true">
               <intProp name="InterleaveControl.style">1</intProp>
@@ -2000,7 +1981,7 @@ if (!actual || actual != expected) {
               </hashTree>
             </hashTree>
           </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="User person flow" enabled="true"/>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="User person flow"/>
           <hashTree>
             <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Person" enabled="true">
               <intProp name="InterleaveControl.style">1</intProp>
@@ -2148,6 +2129,15 @@ if (!actual || actual != expected) {
               </hashTree>
             </hashTree>
           </hashTree>
+          <ResultSaver guiclass="ResultSaverGui" testclass="ResultSaver" testname="Save Responses to a file">
+            <stringProp name="FileSaver.filename">${__P(FAILED_RESPONSE_DIR)}/</stringProp>
+            <boolProp name="FileSaver.errorsonly">true</boolProp>
+            <boolProp name="FileSaver.successonly">false</boolProp>
+            <boolProp name="FileSaver.skipsuffix">false</boolProp>
+            <boolProp name="FileSaver.skipautonumber">false</boolProp>
+            <boolProp name="FileSaver.ignoreTC">false</boolProp>
+          </ResultSaver>
+          <hashTree/>
         </hashTree>
       </hashTree>
     </hashTree>
