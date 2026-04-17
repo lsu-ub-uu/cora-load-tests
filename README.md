@@ -19,7 +19,7 @@
 2. The results will be saved in the `output` folder.
 
 ## Notes
-- For development purposes the script will look for a local environment file named `env.local` in the root of the project. This file should contain values you want to override from the test profile's `env` file. For example, you can set the `HOST` variable to point to a custom host for testing.
+- For development purposes the script will look for a local environment file named `env.local` in the root of the project. This file should contain values you want to override from the test profile's `env` file. For example, you probably want to set the `ADMIN_APPTOKEN` and `DURATION_SECONDS` variables here for test development. 
 
 ## Environment variables for tests
 ```
