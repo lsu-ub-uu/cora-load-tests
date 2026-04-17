@@ -23,17 +23,21 @@
 
 ## Environment variables for tests
 ```
+# System to test
 HOST=somesystem.com
 PORT=30982
 PROTOCOL=http
 
+# Authentication
 ADMIN_USER=adminUser@somesystem.com
 ADMIN_APPTOKEN=admin-token # Apptoken is not stored in any environment file, it should be set elsewhere when running the tests. For development purposes, you can set it in the `env.local` file.
 
+# Load configuration
 USER_LOAD=100
 RAMP_SECONDS=90
 DURATION_SECONDS=900
 
+# User request pacing (per user/thread)
 PACING_BASE_MILLIS=3000
 PACING_VARIANCE_MILLIS=2000
 ```
