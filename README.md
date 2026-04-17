@@ -10,8 +10,8 @@
 
 ### Load test types (profiles)
 - baseline: simulates a normal load on the system to establish a baseline for performance metrics
-- load: simulates a normal load on the system
-- stress: simulates a high load on the system to test its limits
+- load: simulates a higher load on the system
+- stress: simulates a very high load on the system to test its limits
 - spike: simulates a sudden increase in load to test the system's ability to handle spikes
 
 ## Health check
