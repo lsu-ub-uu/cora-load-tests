@@ -415,7 +415,7 @@ if (!paperId?.trim()) {
     &lt;name repeatId=&quot;14&quot; type=&quot;personal&quot;&gt;&#xd;
         &lt;namePart type=&quot;family&quot;&gt;${newUuidPaper}&lt;/namePart&gt;&#xd;
         &lt;role&gt;&#xd;
-            &lt;roleTerm&gt;aut&lt;/roleTerm&gt;&#xd;
+            &lt;roleTerm repeatId=&quot;14&quot;&gt;aut&lt;/roleTerm&gt;&#xd;
         &lt;/role&gt;&#xd;
         &lt;person&gt;&#xd;
             &lt;linkedRecordType&gt;diva-person&lt;/linkedRecordType&gt;&#xd;
